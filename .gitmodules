@@ -1,0 +1,6 @@
+[submodule "site-lisp/breadcrumb"]
+	path = site-lisp/breadcrumb
+	url = git://github.com/josv/breadcrumb.git
+[submodule "site-lisp/coffee-mode"]
+	path = site-lisp/coffee-mode
+	url = git://github.com/josv/coffee-mode.git

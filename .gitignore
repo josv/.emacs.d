@@ -1,0 +1,11 @@
+auto-save-list
+saveplace
+backups
+bookmarks
+*~
+.places
+session.*
+tramp
+elpa
+*.elc
+.yas-compiled-snippets.el
