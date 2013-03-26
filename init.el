@@ -25,7 +25,6 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/misc")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/git")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/breadcrumb")
 
 ;; move my shell buffer to the dir the file is in
 ;; cough hairball if not visiting file
@@ -472,6 +471,7 @@ bottom of the buffer stack."
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 ;; breadcrumbs
+(add-to-list 'load-path "~/.emacs.d/site-lisp/breadcrumb")
 (require 'breadcrumb)
 
 (global-set-key "\C-xj"         'bc-set)            ;; Shift-SPACE for set bookmark
@@ -479,3 +479,8 @@ bottom of the buffer stack."
 (global-set-key [S-f4]          'bc-next)           ;; Shift-M-j for jump to next
 (global-set-key [C-f4]          'bc-goto-current)   ;; C-c j for jump to current bookmark
 (global-set-key [S-C-f4]        'bc-list)           ;; C-x M-j for the bookmark menu list
+
+;; expand region
+(add-to-list 'load-path "~/.emacs.d/site-lisp/expand-region")
+(require 'expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)

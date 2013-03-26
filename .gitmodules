@@ -4,3 +4,6 @@
 [submodule "site-lisp/coffee-mode"]
 	path = site-lisp/coffee-mode
 	url = git://github.com/josv/coffee-mode.git
+[submodule "site-lisp/expand-region"]
+	path = site-lisp/expand-region
+	url = git://github.com/josv/expand-region.el.git
