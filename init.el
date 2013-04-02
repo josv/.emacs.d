@@ -130,6 +130,12 @@ bottom of the buffer stack."
 
 (setq grep-find-ignored-directories '(".svn"))
 
+(defun back-to-indentation-or-beginning ()
+  (interactive)
+  (if (= (point) (save-excursion (back-to-indentation) (point)))
+      (beginning-of-line)
+    (back-to-indentation)))
+
 ;;recentf
 (require 'recentf)
 (recentf-mode 1)
@@ -208,6 +214,7 @@ bottom of the buffer stack."
 (global-set-key [f8] 'compile)
 (global-set-key [f9] 'sw-move-cli-here)
 (global-set-key [(f12)] 'recentf-open-files)
+(global-set-key "\C-a" 'back-to-indentation-or-beginning)
 (global-set-key "\C-l" 'goto-line)          ;; was: redraw garbled screen
 (global-set-key "\C-z" 'undo)               ;; was: suspend-frame
 (global-set-key "\C-o" 'ffap-other-window)  ;; was: open-line
