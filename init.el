@@ -10,10 +10,8 @@
  '(grep-command "grep -nH -e")
  '(grep-find-command "find -L . -type f -print0 | xargs -0 -e grep -nH -e")
  '(grep-find-template "find -L . <X> -type f <F> -print0 | xargs -0 -e grep <C> -nH -e <R>")
- '(grep-o-matic-search-patterns (quote ("*.cpp" "*.c" "*.h" "*.awk" "*.sh" "*.py" "*.pl" "[Mm]akefile" "*.el" "*.asm" "*.cti")))
  '(grep-template "grep <C> -nH -e <R> <F>")
  '(hippie-expand-try-functions-list (quote (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol try-expand-line)))
- '(repository-root-matchers (quote (repository-root-matcher/git repository-root-matcher/svn)))
  '(svn-status-verbose nil))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
@@ -23,8 +21,13 @@
  '(whitespace-tab ((((class color) (background light)) (:background "LightBlue1" :foreground "black")))))
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/misc")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/git")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/browse-kill-ring")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ace-jump-mode")
+
+;; enable functions
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
 
 ;; move my shell buffer to the dir the file is in
 ;; cough hairball if not visiting file
@@ -34,40 +37,45 @@
  or prompt user if the buffer is not visiting the file ."
   (interactive)
   (if buffer-file-name
-      (let (
-            (cli-buffer (get-buffer "cli"))
-            (this-buffer-file buffer-file-name)
-            )
+      (let* (
+             (file-dir (file-name-directory buffer-file-name))
+             (cli-buffer-name (format "cli-%s" file-dir))
+             (cli-buffer (get-buffer cli-buffer-name))
+             )
         (if (bufferp cli-buffer)
             (switch-to-buffer-other-window cli-buffer)
           ;; else make the shell buffer called "cli"
-          (let (
-                (shell-buffer (get-buffer "*shell*"))
-                )
-            (if (not (bufferp shell-buffer))
-                (shell)
-              )
+            (shell)
             (switch-to-buffer-other-window "*shell*")
-            (rename-buffer "cli")
-            )
+            (rename-buffer cli-buffer-name)
           )
         ;; make sure we're at point-max, insert and send input
         (goto-char (point-max))
-        (insert (format "cd %s" (file-name-directory this-buffer-file)))
+        (insert (format "cd %s" file-dir))
         (comint-send-input)
         )
     ;; else buffer-file-name was nil, cough up the hairball
-    (let (
-          (prompt-string
-           (format "This buffer is not visiting a file. Move cli to %s? " default-directory))
-          (def-dir default-directory)
-          )
+    (let* (
+           (def-dir default-directory)
+           (prompt-string
+            (format "This buffer is not visiting a file. Move cli to %s? " def-dir))
+           )
       (if (yes-or-no-p prompt-string)
           ;; cheap job for now: assumes cli exists. need to refactor whole thing now.
-          (progn
-            (switch-to-buffer-other-window (get-buffer "cli"))
+          (let* (
+                 (cli-buffer-name (format "cli-%s" def-dir))
+                 (cli-buffer (get-buffer cli-buffer-name))
+                 )
+            (if (bufferp cli-buffer)
+                (switch-to-buffer-other-window cli-buffer)
+              ;; else make the shell buffer called "cli"
+              (shell)
+              (switch-to-buffer-other-window "*shell*")
+              (rename-buffer cli-buffer-name)
+              )
+            ;; make sure we're at point-max, insert and send input
             (goto-char (point-max))
-            (insert (format "cd %s" (file-name-directory def-dir)))
+            (insert (format "cd %s" def-dir))
             (comint-send-input)
             )
         )
@@ -135,26 +143,37 @@ bottom of the buffer stack."
 
 (setq ibuffer-saved-filter-groups
   (quote (("default"
-            ("Mail"
-              (or  ;; mail-related buffers
-               (mode . message-mode)
-               (mode . mail-mode)
-               ;; etc.; all your mail related modes
-               ))
+           ("Mail"
+            (or  ;; mail-related buffers
+             (mode . message-mode)
+             (mode . mail-mode)
+             ;; etc.; all your mail related modes
+             ))
             ("Kernel"
-              (filename . "linux-2.6"))
+             (filename . "linux-2.6"))
             ("User Space"
-              (filename . "user"))
-	    ("Rake file"
-	      (filename . "rake"))
-            ("Programming" ;; prog stuff not already in MyProjectX
-              (or
-                (mode . c-mode)
-                (mode . perl-mode)
-                (mode . python-mode)
-                (mode . emacs-lisp-mode)
-                ;; etc
-                ))
+             (filename . "user"))
+            ("Programming - C" ;; prog stuff not already in MyProjectX
+             (mode . c-mode))
+            ("Programming - Perl" ;; prog stuff not already in MyProjectX
+             (mode . perl-mode))
+            ("Programming - Python" ;; prog stuff not already in MyProjectX
+             (mode . python-mode))
+            ("Programming - Ruby" ;; prog stuff not already in MyProjectX
+             (mode . ruby-mode))
+            ("Programming - Emacs-Lisp" ;; prog stuff not already in MyProjectX
+             (mode . emacs-lisp-mode))
+            ("YAML" ;; yaml
+               (mode . yaml-mode))
+            ("Expect" ;; expect
+               (filename . ".exp"))
+            ("Configuration" ;; conf
+             (or
+               (mode . conf-mode)
+               (filename . ".conf")
+               ))
+            ("reStructured text" ;; restructured text
+               (mode . rst-mode))
             ("ERC"   (mode . erc-mode))))))
 
 (add-hook 'ibuffer-mode-hook
@@ -172,20 +191,22 @@ bottom of the buffer stack."
 
 ;; keybindings
 (global-set-key (kbd "C-SPC") 'hippie-expand)
+(global-set-key (kbd "S-SPC") 'set-mark-command)
+(global-set-key [f1] 'gtags-find-rtag)
+(global-set-key "\M-n" 'etags-select-find-tag-at-point)
+(global-set-key "\M-p" 'pop-tag-mark)
 (global-set-key [f5] 'split-window-horizontally)
 (global-set-key [S-f5] 'split-window-vertically)
 (global-set-key [M-f5] 'delete-window)
 (global-set-key [C-f5] 'swap-windows)
-(global-set-key [f6] 'forward-paragraph)
-(global-set-key [S-f6] 'backward-paragraph)
-(global-set-key [f7] 'comment-or-uncomment-region)
-(global-set-key [S-f7] 'indent-according-to-mode)
+(global-set-key [f6] 'gud-step)
+(global-set-key [S-f6] 'gud-watch)
+(global-set-key [f7] 'gud-next)
 (global-set-key [f8] 'compile)
 (global-set-key [f9] 'sw-move-cli-here)
 (global-set-key [(f12)] 'recentf-open-files)
 (global-set-key "\C-l" 'goto-line)          ;; was: redraw garbled screen
 (global-set-key "\C-o" 'ffap-other-window)  ;; was: open-line
-(global-set-key "\C-z" 'undo)               ;; was: arguments
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-g" 'find-file-other-window)
 (global-set-key "\C-x\C-m" 'execute-extended-command)
@@ -248,16 +269,16 @@ bottom of the buffer stack."
   (kill-buffer (current-buffer)))
 
 ;; Better etags handling
+(require 'etags-table)
+(setq etags-table-search-up-depth 10)
 (require 'etags-select)
 
 ;; Use also gnu-global - update with global -u
-;(require 'gtags)
+(require 'gtags)
 
 (require 'repository-root) ; optional: needed for repository-wide search
-(require 'grep-a-lot)
-(grep-a-lot-setup-keys)
-(require 'grep-o-matic)
-(require 'ack)
+(add-to-list 'repository-root-matchers repository-root-matcher/git)
+(add-to-list 'repository-root-matchers repository-root-matcher/svn)
 
 (load "dired-x")
 (load "ffap")
@@ -284,12 +305,10 @@ bottom of the buffer stack."
                 tags-file-name
                 register-alist)))
 
-;; (put 'upcase-region 'disabled nil)
-
 ;; transparency
 ;;(set-frame-parameter (selected-frame) 'alpha '(<active> [<inactive>]))
-(set-frame-parameter (selected-frame) 'alpha '(85 50))
-(add-to-list 'default-frame-alist '(alpha 85 50))
+(set-frame-parameter (selected-frame) 'alpha '(90 60))
+(add-to-list 'default-frame-alist '(alpha 90 60))
 
 ;; change scrollbar behaviour
 (setq
@@ -381,20 +400,18 @@ bottom of the buffer stack."
   (setq indent-tabs-mode t)
   (setq c-basic-offset 8))
 
-(setq auto-mode-alist (cons '("linux-2.6.x\\.*\\.[ch]$" . linux-c-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("linux-2.6.x.*\\.[ch]$" . linux-c-mode) auto-mode-alist))
 
 ;; git support
-(require 'git)
-(require 'git-blame)
+(require 'magit)
 
 ;; really big files are opened read-only
 (defun find-file-check-make-large-file-read-only-hook ()
  "If a file is over a given size, make the buffer read only."
- (when (> (buffer-size) (* 20480 1024))
+ (when (> (buffer-size) (* 204800 1024))
    (setq buffer-read-only t)
    (buffer-disable-undo)
    (message "Buffer is set to read-only because it is large.  Undo also disabled.")))
-
 
 (add-hook 'find-file-hooks 'find-file-check-make-large-file-read-only-hook)
 
@@ -426,28 +443,84 @@ bottom of the buffer stack."
 (setq get-rfc-open-in-new-frame nil)
 
 ;; set colors
-(set-foreground-color "white")
 (set-background-color "black")
+(set-foreground-color "white")
+
+;; ansi color for shell
+(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
+;; autopairing
+(require 'autopair)
+(autopair-global-mode 1)
+(setq autopair-autowrap t)
+
+;; highlight FIXME/TODO and similar
+(require 'fic-mode)
+(add-hook 'c-mode-hook 'turn-on-fic-mode)
+(add-hook 'emacs-lisp-mode-hook 'turn-on-fic-mode)
+
+;; css
+(require 'css-complete)
+
+;; enable clipboard, see also http://stackoverflow.com/questions/64360/how-to-copy-text-from-emacs-to-another-application-on-linux
+(setq x-select-enable-clipboard t)
 
 ;; Interactively Do Things (highly recommended, but not strictly required)
 (require 'ido)
-(ido-mode t)
+(setq ido-mode t)
 
-;;; This was installed by package-install.el.
-;;; This provides support for the package system and
-;;; interfacing with ELPA, the package archive.
-;;; Move this code earlier if you want to reference
-;;; packages in your .emacs.
-(when
-    (load
-     (expand-file-name "~/.emacs.d/elpa/package.el"))
-  (package-initialize))
+;; tabs
+(setq-default indent-tabs-mode nil)
 
-;; coffeescript
+;; add coffee-mode
 (require 'coffee-mode)
 
 ;; God files are ruby files
 (setq auto-mode-alist (cons '("\\.god$" . ruby-mode) auto-mode-alist))
+
+;; add grep-a-lot - manages multiple grep buffers
+(require 'grep-a-lot)
+(grep-a-lot-setup-keys)
+
+;; generate TAGS file
+(setq path-to-ctags "/usr/bin/ctags-exuberant") ;; <- your ctags path here
+
+(defun create-tags (dir-name)
+  "Create tags file."
+  (interactive "DDirectory: ")
+  (shell-command
+   (format "%s -f %s/TAGS -e -R %s" path-to-ctags dir-name (directory-file-name dir-name)))
+  )
+
+;; auto update TAGS file (on save)
+(require 'ctags-update)
+(ctags-update-minor-mode 1)
+
+;; revert without asking
+(setq tags-revert-without-query 1)
+
+;; markdown mode
+(autoload 'markdown-mode "markdown-mode.el"
+  "Major mode for editing Markdown files" t)
+(setq auto-mode-alist
+      (cons '("\\.md$" . markdown-mode) auto-mode-alist))
+
+;; move point forward n words and place cursor at the beginning
+(defun forward-word-to-beginning (&optional n)
+  "Move point forward n words and place cursor at the beginning."
+  (interactive "p")
+  (let (myword)
+    (setq myword
+      (if (and transient-mark-mode mark-active)
+        (buffer-substring-no-properties (region-beginning) (region-end))
+        (thing-at-point 'symbol)))
+    (if (not (eq myword nil))
+      (forward-word n))
+    (forward-word n)
+    (backward-word n)))
+
+(global-set-key [C-right] 'forward-word-to-beginning)
 
 ;; start emacs server
 (server-start)
@@ -465,22 +538,79 @@ bottom of the buffer stack."
    "Major mode for editing Markdown files" t)
 (setq auto-mode-alist
    (cons '("\\.md" . markdown-mode) auto-mode-alist))
+;; w3m
+
+(setq browse-url-browser-function 'w3m-browse-url)
+(autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+;; optional keyboard short-cut
+(global-set-key "\C-xm" 'browse-url-at-point)
+(setq w3m-default-display-inline-images t)
+(setq w3m-use-cookies t)
+
+;; browse-kill-ring (M-y)
+(require 'browse-kill-ring)
+(browse-kill-ring-default-keybindings)
+
+;; yasnippet
+(add-to-list 'load-path "~/.emacs.d/site-lisp/yasnippet")
+(require 'yasnippet)
+(yas-global-mode 1)
 
 ;; copy/paste
 (setq x-select-enable-clipboard t)
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+(setq lpr-command "xpp")
 
 ;; breadcrumbs
 (add-to-list 'load-path "~/.emacs.d/site-lisp/breadcrumb")
 (require 'breadcrumb)
-
 (global-set-key "\C-xj"         'bc-set)            ;; Shift-SPACE for set bookmark
 (global-set-key [f4]            'bc-previous)       ;; M-j for jump to previous
 (global-set-key [S-f4]          'bc-next)           ;; Shift-M-j for jump to next
+;;(global-set-key [(meta up)]     'bc-local-previous) ;; M-up-arrow for local previous
+;;(global-set-key [(meta down)]   'bc-local-next)     ;; M-down-arrow for local next
 (global-set-key [C-f4]          'bc-goto-current)   ;; C-c j for jump to current bookmark
-(global-set-key [S-C-f4]        'bc-list)           ;; C-x M-j for the bookmark menu list
+(global-set-key [C-S-f4]        'bc-list)           ;; C-x M-j for the bookmark menu list
+
+;; ace jump mode major function
+(autoload
+  'ace-jump-mode
+  "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
+;; you can select the key you prefer to
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
+;;indent whole buffer
+(defun iwb ()
+  "indent whole buffer"
+  (interactive)
+  (delete-trailing-whitespace)
+  (indent-region (point-min) (point-max) nil)
+  (untabify (point-min) (point-max)))
+(define-key global-map (kbd "C-c n") 'iwb)
+
+;; C-n adds newline
+(setq next-line-add-newlines t)
 
 ;; expand region
 (add-to-list 'load-path "~/.emacs.d/site-lisp/expand-region")
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
+
+;; load project files
+;; Functions (load all files in project-dir and one sublevel of project-dir)
+(setq projects-dir (expand-file-name "projects" user-emacs-directory))
+(dolist (file (directory-files projects-dir t "\\w+"))
+  (when (file-regular-p file)
+    (when (string= "el" (file-name-extension file))
+      (load file)))
+  (when (file-directory-p file)
+    (dolist (project-file (directory-files file t "\\w+"))
+      (when (file-regular-p project-file)
+        (when (string= "el" (file-name-extension project-file))
+          (load project-file))))))
+
+
+
+
