@@ -467,7 +467,14 @@ bottom of the buffer stack."
 
 ;; Interactively Do Things (highly recommended, but not strictly required)
 (require 'ido)
-(setq ido-mode t)
+(ido-mode t)
+(setq ido-enable-prefix nil
+      ido-enable-flex-matching t
+      ido-case-fold t
+      ido-auto-merge-work-directories-length 0
+      ido-create-new-buffer 'always
+      ido-use-filename-at-point t
+      ido-max-prospects 10)
 
 ;; tabs
 (setq-default indent-tabs-mode nil)
