@@ -209,6 +209,7 @@ bottom of the buffer stack."
 (global-set-key [f9] 'sw-move-cli-here)
 (global-set-key [(f12)] 'recentf-open-files)
 (global-set-key "\C-l" 'goto-line)          ;; was: redraw garbled screen
+(global-set-key "\C-z" 'undo)               ;; was: suspend-frame
 (global-set-key "\C-o" 'ffap-other-window)  ;; was: open-line
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-g" 'find-file-other-window)
@@ -428,9 +429,6 @@ bottom of the buffer stack."
 ;;clean-buffer-list-delay-general
 ;;clean-buffer-list-delay-special
 
-;; enable cua-mode
-(cua-mode)
-
 ;; find rfc
 (require 'get-rfc)
 (require 'rfcview)
@@ -608,7 +606,16 @@ bottom of the buffer stack."
 ;; expand region
 (add-to-list 'load-path "~/.emacs.d/site-lisp/expand-region")
 (require 'expand-region)
-(global-set-key (kbd "C-=") 'er/expand-region)
+(global-set-key (kbd "C-c m") 'er/expand-region)
+
+;; multiple cursors
+(add-to-list 'load-path "~/.emacs.d/site-lisp/multiple-cursors")
+(require 'multiple-cursors)
+
+(global-set-key (kbd "C-c e") 'mc/edit-lines)
+(global-set-key (kbd "C-c j") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-c k") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c l") 'mc/mark-all-like-this-dwim)
 
 ;; load project files
 ;; Functions (load all files in project-dir and one sublevel of project-dir)
@@ -622,4 +629,3 @@ bottom of the buffer stack."
       (when (file-regular-p project-file)
         (when (string= "el" (file-name-extension project-file))
           (load project-file))))))
-
