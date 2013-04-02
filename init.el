@@ -465,7 +465,7 @@ bottom of the buffer stack."
 ;; enable clipboard, see also http://stackoverflow.com/questions/64360/how-to-copy-text-from-emacs-to-another-application-on-linux
 (setq x-select-enable-clipboard t)
 
-;; Interactively Do Things (highly recommended, but not strictly required)
+;; Interactively Do Things
 (require 'ido)
 (ido-mode t)
 (setq ido-enable-prefix nil
@@ -473,7 +473,7 @@ bottom of the buffer stack."
       ido-case-fold t
       ido-auto-merge-work-directories-length 0
       ido-create-new-buffer 'always
-      ido-use-filename-at-point t
+      ido-use-filename-at-point nil
       ido-max-prospects 10)
 
 ;; tabs
