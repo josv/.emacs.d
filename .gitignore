@@ -10,4 +10,4 @@ session.*
 tramp
 elpa
 *.elc
-.yas-compiled-snippets.el
+snippets
