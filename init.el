@@ -13,6 +13,7 @@
  '(grep-template "grep <C> -nH -e <R> <F>")
  '(hippie-expand-try-functions-list (quote (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol try-expand-line)))
  '(svn-status-verbose nil))
+
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -20,10 +21,11 @@
   ;; If there is more than one, they won't work right.
  '(whitespace-tab ((((class color) (background light)) (:background "LightBlue1" :foreground "black")))))
 
+;; set colors
+(set-background-color "black")
+(set-foreground-color "white")
+
 (add-to-list 'load-path "~/.emacs.d/site-lisp/misc")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/browse-kill-ring")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/ace-jump-mode")
 
 ;; enable functions
 (put 'downcase-region 'disabled nil)
@@ -133,6 +135,7 @@ bottom of the buffer stack."
 (recentf-mode 1)
 (setq recentf-max-saved-items 500)
 (setq recentf-max-menu-items 60)
+(setq recentf-save-file (expand-file-name "recentf" user-emacs-directory))
 
 ;;ibuffer
 (require 'ibuffer)
@@ -442,10 +445,6 @@ bottom of the buffer stack."
 
 (setq get-rfc-open-in-new-frame nil)
 
-;; set colors
-(set-background-color "black")
-(set-foreground-color "white")
-
 ;; ansi color for shell
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -474,6 +473,7 @@ bottom of the buffer stack."
 (setq-default indent-tabs-mode nil)
 
 ;; add coffee-mode
+(add-to-list 'load-path "~/.emacs.d/site-lisp/coffee-mode")
 (require 'coffee-mode)
 
 ;; God files are ruby files
@@ -548,6 +548,7 @@ bottom of the buffer stack."
 (setq w3m-use-cookies t)
 
 ;; browse-kill-ring (M-y)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/browse-kill-ring")
 (require 'browse-kill-ring)
 (browse-kill-ring-default-keybindings)
 
@@ -564,6 +565,9 @@ bottom of the buffer stack."
 ;; breadcrumbs
 (add-to-list 'load-path "~/.emacs.d/site-lisp/breadcrumb")
 (require 'breadcrumb)
+
+(setq bc-bookmark-file (expand-file-name "breadcrumb" user-emacs-directory))
+
 (global-set-key "\C-xj"         'bc-set)            ;; Shift-SPACE for set bookmark
 (global-set-key [f4]            'bc-previous)       ;; M-j for jump to previous
 (global-set-key [S-f4]          'bc-next)           ;; Shift-M-j for jump to next
@@ -573,6 +577,7 @@ bottom of the buffer stack."
 (global-set-key [C-S-f4]        'bc-list)           ;; C-x M-j for the bookmark menu list
 
 ;; ace jump mode major function
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ace-jump-mode")
 (autoload
   'ace-jump-mode
   "ace-jump-mode"
@@ -610,7 +615,4 @@ bottom of the buffer stack."
       (when (file-regular-p project-file)
         (when (string= "el" (file-name-extension project-file))
           (load project-file))))))
-
-
-
 

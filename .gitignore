@@ -2,6 +2,8 @@ auto-save-list
 saveplace
 backups
 bookmarks
+recentf
+breadcrumb
 *~
 .places
 session.*
