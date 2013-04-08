@@ -201,9 +201,9 @@ bottom of the buffer stack."
 ;; keybindings
 (global-set-key (kbd "C-SPC") 'hippie-expand)
 (global-set-key (kbd "S-SPC") 'set-mark-command)
-(global-set-key [f1] 'gtags-find-rtag)
 (global-set-key "\M-n" 'etags-select-find-tag-at-point)
 (global-set-key "\M-p" 'pop-tag-mark)
+(global-set-key [f1] 'help-command)
 (global-set-key [f5] 'split-window-horizontally)
 (global-set-key [S-f5] 'split-window-vertically)
 (global-set-key [M-f5] 'delete-window)
@@ -212,6 +212,7 @@ bottom of the buffer stack."
 (global-set-key [S-f6] 'gud-watch)
 (global-set-key [f7] 'gud-next)
 (global-set-key [f8] 'compile)
+(global-set-key [S-f8] 'gtags-find-rtag)
 (global-set-key [f9] 'sw-move-cli-here)
 (global-set-key [(f12)] 'recentf-open-files)
 (global-set-key "\C-a" 'back-to-indentation-or-beginning)
@@ -385,9 +386,9 @@ bottom of the buffer stack."
     (setq header-line-format which-func-header-line-format)))
 
 ;; saves last position of point
-(setq save-place-file "~/.emacs.d/saveplace") ;; keep my ~/ clean
-(setq-default save-place t)                   ;; activate it for all buffers
 (require 'saveplace)                          ;; get the package
+(setq save-place-file (expand-file-name "saveplace" user-emacs-directory))
+(setq-default save-place t)                   ;; activate it for all buffers
 
 ;; guess-style
 ;;(autoload 'guess-style-set-variable "guess-style" nil t)
@@ -581,12 +582,12 @@ bottom of the buffer stack."
 (setq bc-bookmark-file (expand-file-name "breadcrumb" user-emacs-directory))
 
 (global-set-key "\C-xj"         'bc-set)            ;; Shift-SPACE for set bookmark
-(global-set-key [f4]            'bc-previous)       ;; M-j for jump to previous
-(global-set-key [S-f4]          'bc-next)           ;; Shift-M-j for jump to next
+(global-set-key [f2]            'bc-previous)       ;; M-j for jump to previous
+(global-set-key [S-f2]          'bc-next)           ;; Shift-M-j for jump to next
 ;;(global-set-key [(meta up)]     'bc-local-previous) ;; M-up-arrow for local previous
 ;;(global-set-key [(meta down)]   'bc-local-next)     ;; M-down-arrow for local next
-(global-set-key [C-f4]          'bc-goto-current)   ;; C-c j for jump to current bookmark
-(global-set-key [C-S-f4]        'bc-list)           ;; C-x M-j for the bookmark menu list
+(global-set-key [C-f2]          'bc-goto-current)   ;; C-c j for jump to current bookmark
+(global-set-key [C-S-f2]        'bc-list)           ;; C-x M-j for the bookmark menu list
 
 ;; ace jump mode major function
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ace-jump-mode")
@@ -606,9 +607,6 @@ bottom of the buffer stack."
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
 (define-key global-map (kbd "C-c n") 'iwb)
-
-;; C-n adds newline
-(setq next-line-add-newlines t)
 
 ;; expand region
 (add-to-list 'load-path "~/.emacs.d/site-lisp/expand-region")
