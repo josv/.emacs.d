@@ -11,3 +11,4 @@ tramp
 elpa
 *.elc
 snippets
+.mc-lists.el
