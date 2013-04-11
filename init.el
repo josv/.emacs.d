@@ -416,6 +416,8 @@ bottom of the buffer stack."
 
 ;; git support
 (require 'magit)
+(set-face-foreground 'magit-diff-add "green1")
+(set-face-foreground 'magit-diff-del "red4")
 
 ;; really big files are opened read-only
 (defun find-file-check-make-large-file-read-only-hook ()
