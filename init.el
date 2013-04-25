@@ -636,3 +636,6 @@ bottom of the buffer stack."
       (when (file-regular-p project-file)
         (when (string= "el" (file-name-extension project-file))
           (load project-file))))))
+
+;; tramp does not like zsh
+(eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
