@@ -203,7 +203,11 @@ bottom of the buffer stack."
 (global-set-key (kbd "S-SPC") 'set-mark-command)
 (global-set-key "\M-n" 'etags-select-find-tag-at-point)
 (global-set-key "\M-p" 'pop-tag-mark)
+
+;; Use shell-like backspace C-h, rebind help to F1
+(define-key key-translation-map [?\C-h] [?\C-?])
 (global-set-key [f1] 'help-command)
+
 (global-set-key [f5] 'split-window-horizontally)
 (global-set-key [S-f5] 'split-window-vertically)
 (global-set-key [M-f5] 'delete-window)
