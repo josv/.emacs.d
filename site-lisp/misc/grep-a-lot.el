@@ -178,7 +178,7 @@ Return -1 if NAME is does not match `grep-a-lot-buffer-name-regexp'."
 
 (defun grep-a-lot-buffer-name (position)
   "Return name of grep-a-lot buffer at POSITION."
-  (concat "*grep*<" (number-to-string position) ">"))
+  (concat "*grep*<" (format "%03d" position) ">"))
 
 (defun grep-a-lot-buffer-name-function (name)
   "Set current grep search results buffer name."

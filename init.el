@@ -379,16 +379,6 @@ bottom of the buffer stack."
 (load "which-func")
 (which-func-mode 1)
 
-(delete (assoc 'which-func-mode mode-line-format) mode-line-format)
-(setq which-func-header-line-format
-              '(which-func-mode
-                ("" which-func-format
-                 )))
-(defadvice which-func-ff-hook (after header-line activate)
-  (when which-func-mode
-    (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
-    (setq header-line-format which-func-header-line-format)))
-
 ;; saves last position of point
 (require 'saveplace)                          ;; get the package
 (setq save-place-file (expand-file-name "saveplace" user-emacs-directory))
