@@ -1,8 +1,8 @@
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(case-fold-search t)
  '(current-language-environment "UTF-8")
  '(default-input-method "rfc1345")
@@ -12,13 +12,14 @@
  '(grep-find-template "find -L . <X> -type f <F> -print0 | xargs -0 -e grep <C> -nH -e <R>")
  '(grep-template "grep <C> -nH -e <R> <F>")
  '(hippie-expand-try-functions-list (quote (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol try-expand-line)))
+ '(ps-lpr-command "gtklp")
  '(svn-status-verbose nil))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(whitespace-tab ((((class color) (background light)) (:background "LightBlue1" :foreground "black")))))
 
 ;; set colors
@@ -172,6 +173,8 @@ bottom of the buffer stack."
              (mode . ruby-mode))
             ("Programming - Emacs-Lisp" ;; prog stuff not already in MyProjectX
              (mode . emacs-lisp-mode))
+            ("Grep" ;; grep buffers
+             (mode . grep-mode))
             ("YAML" ;; yaml
                (mode . yaml-mode))
             ("Expect" ;; expect
@@ -250,12 +253,18 @@ bottom of the buffer stack."
 	  'comint-watch-for-password-prompt)
 
 ;; Frame title bar formatting to show full path of file
-(setq-default
- frame-title-format
- (list '((buffer-file-name " %f" (dired-directory
-	 			  dired-directory
-				  (revert-buffer-function " %b"
-				  ("%b - Dir:  " default-directory)))))))
+
+;;(setq-default
+;; frame-title-format
+;; (list '((abbreviate-file-name(buffer-file-name) "%f" (dired-directory
+;;	 			  dired-directory
+;;				  (revert-buffer-function " %b"
+;;				  ("%b - Dir:  " default-directory)))))))
+
+(setq frame-title-format
+  '(((:eval (if (buffer-file-name)
+                (abbreviate-file-name (buffer-file-name))
+                  "%b")) " [%*]")))
 
 (setq-default
  icon-title-format
@@ -323,8 +332,8 @@ bottom of the buffer stack."
 
 ;; transparency
 ;;(set-frame-parameter (selected-frame) 'alpha '(<active> [<inactive>]))
-(set-frame-parameter (selected-frame) 'alpha '(90 60))
-(add-to-list 'default-frame-alist '(alpha 90 60))
+(set-frame-parameter (selected-frame) 'alpha '(95 90))
+(add-to-list 'default-frame-alist '(alpha 95 90))
 
 ;; change scrollbar behaviour
 (setq
@@ -406,7 +415,7 @@ bottom of the buffer stack."
   (setq indent-tabs-mode t)
   (setq c-basic-offset 8))
 
-(setq auto-mode-alist (cons '("linux-2.6.x.*\\.[ch]$" . linux-c-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("linux-*\\.[ch]$" . linux-c-mode) auto-mode-alist))
 
 ;; git support
 (require 'magit)
@@ -569,7 +578,7 @@ bottom of the buffer stack."
 ;; copy/paste
 (setq x-select-enable-clipboard t)
 (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
-(setq lpr-command "xpp")
+(setq lpr-command "gtklp")
 
 ;; breadcrumbs
 (add-to-list 'load-path "~/.emacs.d/site-lisp/breadcrumb")
