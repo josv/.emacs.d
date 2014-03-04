@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: oatrace
+# key: oatrc
+# --
+TRACE("$0");

@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: oa header file
+# key: oaheader
+# --
+
+/******************* ONEACCESS ****************************
+ * \file    `(file-name-nondirectory (buffer-file-name))`
+ * \brief   ${brief}
+ *
+ * \author  ${author}
+ *
+ * \warning ${warning}
+ *
+ * \todo    ${todo}
+ *
+ * \note ${note}
+ ***********************************************************/
+
+#ifndef ${1:_`(upcase (file-name-nondirectory (file-name-sans-extension (buffer-file-name))))`_H_}
+#define $1
+
+$0
+
+#endif /* $1 */

@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: oamcapisrc
+# key: oamcapisrc
+# --
+/******************* ONEACCESS ******************************
+ * \file    `(file-name-nondirectory (buffer-file-name))`
+ * \brief   ${brief}
+ *
+ * \author  ${author}
+ *
+ * \warning ${warning}
+ *
+ * \todo    ${todo}
+ *
+ * \note ${note}
+ ***********************************************************/
+
+#include <oamcapi.h>
+
+void `(file-name-nondirectory (file-name-sans-extension(buffer-file-name)))`($0)
+{
+   $1
+}

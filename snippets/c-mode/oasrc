@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: oa source file
+# key: oasrc
+# --
+/******************* ONEACCESS ******************************
+ * \file    `(file-name-nondirectory (buffer-file-name))`
+ * \brief   ${brief}
+ *
+ * \author  ${author}
+ *
+ * \warning ${warning}
+ *
+ * \todo    ${todo}
+ *
+ * \note ${note}
+ ***********************************************************/
+
+$0
