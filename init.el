@@ -25,6 +25,8 @@
 ;; set colors
 (set-background-color "black")
 (set-foreground-color "white")
+(add-to-list 'default-frame-alist '(foreground-color . "white"))
+(add-to-list 'default-frame-alist '(background-color . "black"))
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/misc")
 
@@ -229,6 +231,7 @@ bottom of the buffer stack."
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-g" 'find-file-other-window)
 (global-set-key "\C-x\C-m" 'execute-extended-command)
+(global-set-key "\C-c\C-m" 'execute-extended-command)
 (global-set-key "\C-x\C-k" 'kill-region)
 (global-set-key "\M-r" 'isearch-backward-regexp)
 (global-set-key "\M-s" 'isearch-forward-regexp)
@@ -642,3 +645,17 @@ bottom of the buffer stack."
 
 ;; tramp does not like zsh
 (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
+
+;; Toggle window dedication
+(defun toggle-window-dedicated ()
+  "Toggle whether the current active window is dedicated or not"
+  (interactive)
+  (message 
+   (if (let (window (get-buffer-window (current-buffer)))
+         (set-window-dedicated-p window 
+                                 (not (window-dedicated-p window))))
+       "Window '%s' is dedicated"
+     "Window '%s' is normal")
+   (current-buffer)))
+
+(global-set-key [pause] 'toggle-window-dedicated)
