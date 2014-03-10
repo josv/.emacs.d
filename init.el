@@ -176,7 +176,10 @@ bottom of the buffer stack."
             ("Programming - Emacs-Lisp" ;; prog stuff not already in MyProjectX
              (mode . emacs-lisp-mode))
             ("Grep" ;; grep buffers
-             (mode . grep-mode))
+             (or
+              (mode . grep-mode)
+              (mode . ag-mode)
+              ))
             ("YAML" ;; yaml
                (mode . yaml-mode))
             ("Expect" ;; expect
@@ -659,3 +662,9 @@ bottom of the buffer stack."
    (current-buffer)))
 
 (global-set-key [pause] 'toggle-window-dedicated)
+
+;; add ag - the silver searcher
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ag")
+(require 'ag)
+(setq ag-highlight-search t)
+

@@ -19,3 +19,6 @@
 [submodule "site-lisp/multiple-cursors"]
 	path = site-lisp/multiple-cursors
 	url = git://github.com/josv/multiple-cursors.el
+[submodule "site-lisp/ag"]
+	path = site-lisp/ag
+	url = https://github.com/Wilfred/ag.el.git
