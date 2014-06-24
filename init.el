@@ -750,3 +750,13 @@ bottom of the buffer stack."
 (add-to-list 'rcirc-server-alist
                        '("irc.freenode.org"
                          :channels ("#emacs")))
+
+;; oauth (for readability)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-oauth")
+
+;; overlay (for readability)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ov")
+
+;; readability
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-readability")
+(require 'readability)

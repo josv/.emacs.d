@@ -11,3 +11,5 @@ tramp
 elpa
 *.elc
 .mc-lists.el
+readability-token
+url/
