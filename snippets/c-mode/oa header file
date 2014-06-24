@@ -14,6 +14,13 @@
  * \todo    ${todo}
  *
  * \note ${note}
+ *
+ * \copyright OneAccess
+ *
+ * Copyright 2013 OneAccess. All rights reserved. All information contained
+ * herein is proprietary and confidential to OneAccess. Any use, reproduction,
+ * or disclosure without the written permission of OneAccess is prohibited.
+ * 
  ***********************************************************/
 
 #ifndef ${1:_`(upcase (file-name-nondirectory (file-name-sans-extension (buffer-file-name))))`_H_}

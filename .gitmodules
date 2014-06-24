@@ -22,3 +22,6 @@
 [submodule "site-lisp/ag"]
 	path = site-lisp/ag
 	url = https://github.com/Wilfred/ag.el.git
+[submodule "site-lisp/wgrep"]
+	path = site-lisp/wgrep
+	url = https://github.com/mhayashi1120/Emacs-wgrep.git

@@ -181,16 +181,18 @@ bottom of the buffer stack."
               (mode . ag-mode)
               ))
             ("YAML" ;; yaml
-               (mode . yaml-mode))
+             (mode . yaml-mode))
             ("Expect" ;; expect
-               (filename . ".exp"))
+             (filename . ".exp"))
+            ("Man" ;; man
+             (mode . man-mode))
             ("Configuration" ;; conf
              (or
                (mode . conf-mode)
                (filename . ".conf")
                ))
             ("reStructured text" ;; restructured text
-               (mode . rst-mode))
+             (mode . rst-mode))
             ("ERC"   (mode . erc-mode))))))
 
 (add-hook 'ibuffer-mode-hook
@@ -230,16 +232,11 @@ bottom of the buffer stack."
 (global-set-key "\C-a" 'back-to-indentation-or-beginning)
 (global-set-key "\C-l" 'goto-line)          ;; was: redraw garbled screen
 (global-set-key "\C-z" 'undo)               ;; was: suspend-frame
-(global-set-key "\C-o" 'ffap-other-window)  ;; was: open-line
 (global-set-key "\C-w" 'backward-kill-word)
-(global-set-key "\C-x\C-g" 'find-file-other-window)
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
-(global-set-key "\C-x\C-k" 'kill-region)
 (global-set-key "\M-r" 'isearch-backward-regexp)
 (global-set-key "\M-s" 'isearch-forward-regexp)
-(global-set-key [?\C-x prior] 'previous-error)
-(global-set-key [?\C-x next]  'next-error)
 
 (defalias 'qrr 'query-replace-regexp)
 
@@ -562,8 +559,8 @@ bottom of the buffer stack."
    "Major mode for editing Markdown files" t)
 (setq auto-mode-alist
    (cons '("\\.md" . markdown-mode) auto-mode-alist))
-;; w3m
 
+;; w3m
 (setq browse-url-browser-function 'w3m-browse-url)
 (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
 ;; optional keyboard short-cut
@@ -609,6 +606,17 @@ bottom of the buffer stack."
   t)
 ;; you can select the key you prefer to
 (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
+;; enable a more powerful jump back function from ace jump mode
+;;
+(autoload
+  'ace-jump-mode-pop-mark
+  "ace-jump-mode"
+  "Ace jump back:-)"
+  t)
+(eval-after-load "ace-jump-mode"
+  '(ace-jump-mode-enable-mark-sync))
+(define-key global-map (kbd "C-c p") 'ace-jump-mode-pop-mark)
 
 ;;indent whole buffer
 (defun iwb ()
@@ -663,8 +671,82 @@ bottom of the buffer stack."
 
 (global-set-key [pause] 'toggle-window-dedicated)
 
-;; add ag - the silver searcher
+;; Add ag - the silver searcher
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ag")
 (require 'ag)
 (setq ag-highlight-search t)
 
+;; Copy without selection
+(defun get-point (symbol &optional arg)
+  "get the point"
+  (funcall symbol arg)
+  (point)
+  )
+
+(defun copy-thing (begin-of-thing end-of-thing &optional arg)
+  "copy thing between beg & end into kill ring"
+  (save-excursion
+    (let ((beg (get-point begin-of-thing 1))
+          (end (get-point end-of-thing arg)))
+      (copy-region-as-kill beg end)
+      (message "copy %d %d" beg end)
+      ))
+  )
+
+(defun paste-to-mark(&optional arg)
+  "Paste things to mark, or to the prompt in shell-mode"
+  (let ((pasteMe 
+     	 (lambda()
+     	   (if (string= "shell-mode" major-mode)
+               (progn (comint-next-prompt 25535) (yank))
+             (progn (ace-jump-mode-pop-mark) (yank) )))))
+    (if arg
+        (if (= arg 1)
+            nil
+          (funcall pasteMe))
+      (funcall pasteMe))
+    ))
+
+(defun copy-word (&optional arg)
+  "Copy words at point into kill-ring"
+  (interactive "P")
+  (forward-word)
+  (copy-thing 'backward-word 'forward-word arg)
+  (paste-to-mark arg)
+  )
+
+(global-set-key (kbd "C-c w") (quote copy-word))
+
+(defun beginning-of-string(&optional arg)
+  "  "
+  (re-search-backward "[ \t,;=()&]" (line-beginning-position) 3 1)
+  (if (looking-at "[ \t,;=()&]")  (goto-char (+ (point) 1)) )
+  )
+
+(defun end-of-string(&optional arg)
+  " "
+  (re-search-forward "[ \t,;=()]" (line-end-position) 3 arg)
+  (if (looking-back "[ \t,;=()]") (goto-char (- (point) 1)) )
+  )
+
+(defun thing-copy-string-to-mark(&optional arg)
+  " Try to copy a string and paste it to the mark
+     When used in shell-mode, it will paste string on shell prompt by default "
+  (interactive "P")
+  (copy-thing 'beginning-of-string 'end-of-string arg)
+  (paste-to-mark arg)
+  )
+
+(global-set-key (kbd "C-c s")  (quote thing-copy-string-to-mark))
+
+;; wgrep - edit results inline
+(add-to-list 'load-path "~/.emacs.d/site-lisp/wgrep")
+(require 'wgrep)
+(autoload 'wgrep-ag-setup "wgrep-ag")
+(add-hook 'ag-mode-hook 'wgrep-ag-setup)
+
+;; irc
+(setq rcirc-default-nick "johnsimon")
+(add-to-list 'rcirc-server-alist
+                       '("irc.freenode.org"
+                         :channels ("#emacs")))
