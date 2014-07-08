@@ -28,3 +28,9 @@
 [submodule "site-lisp/emacs-oauth"]
 	path = site-lisp/emacs-oauth
 	url = https://github.com/psanford/emacs-oauth.git
+[submodule "site-lisp/emacs-readability"]
+	path = site-lisp/emacs-readability
+	url = https://github.com/ShingoFukuyama/emacs-readability.git
+[submodule "site-lisp/ov"]
+	path = site-lisp/ov
+	url = https://github.com/ShingoFukuyama/ov.el.git
