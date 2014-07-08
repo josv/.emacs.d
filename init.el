@@ -140,11 +140,11 @@ bottom of the buffer stack."
     (back-to-indentation)))
 
 ;;recentf
+(setq recentf-save-file (expand-file-name "recentf" user-emacs-directory))
 (require 'recentf)
 (recentf-mode 1)
 (setq recentf-max-saved-items 500)
 (setq recentf-max-menu-items 60)
-(setq recentf-save-file (expand-file-name "recentf" user-emacs-directory))
 
 ;;ibuffer
 (require 'ibuffer)
@@ -747,15 +747,20 @@ bottom of the buffer stack."
 
 ;; irc
 (setq rcirc-default-nick "johnsimon")
-(add-to-list 'rcirc-server-alist
-                       '("irc.freenode.org"
-                         :channels ("#emacs")))
+
+(setq rcirc-server-alist
+      '(("irc.freenode.net" :port 6697 :encryption tls
+	 :channels ("#rcirc" "#emacs"))))
+
 
 ;; oauth (for readability)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-oauth")
 
 ;; overlay (for readability)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ov")
+
+;; async
+(add-to-list 'load-path "~/.emacs.d/site-lisp/async")
 
 ;; readability
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-readability")

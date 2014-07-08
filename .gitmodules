@@ -34,3 +34,6 @@
 [submodule "site-lisp/ov"]
 	path = site-lisp/ov
 	url = https://github.com/ShingoFukuyama/ov.el.git
+[submodule "site-lisp/async"]
+	path = site-lisp/async
+	url = https://github.com/jwiegley/emacs-async.git
