@@ -25,3 +25,6 @@
 [submodule "site-lisp/wgrep"]
 	path = site-lisp/wgrep
 	url = https://github.com/mhayashi1120/Emacs-wgrep.git
+[submodule "site-lisp/emacs-oauth"]
+	path = site-lisp/emacs-oauth
+	url = https://github.com/psanford/emacs-oauth.git
