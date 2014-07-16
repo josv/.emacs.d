@@ -34,60 +34,6 @@
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
-;; move my shell buffer to the dir the file is in
-;; cough hairball if not visiting file
-;; make cli if don't exist
-(defun sw-move-cli-here ()
-  "Move the cli buffer to the directory where the currently visited file is located,
- or prompt user if the buffer is not visiting the file ."
-  (interactive)
-  (if buffer-file-name
-      (let* (
-             (file-dir (file-name-directory buffer-file-name))
-             (cli-buffer-name (format "cli-%s" file-dir))
-             (cli-buffer (get-buffer cli-buffer-name))
-             )
-        (if (bufferp cli-buffer)
-            (switch-to-buffer-other-window cli-buffer)
-          ;; else make the shell buffer called "cli"
-            (shell)
-            (switch-to-buffer-other-window "*shell*")
-            (rename-buffer cli-buffer-name)
-          )
-        ;; make sure we're at point-max, insert and send input
-        (goto-char (point-max))
-        (insert (format "cd %s" file-dir))
-        (comint-send-input)
-        )
-    ;; else buffer-file-name was nil, cough up the hairball
-    (let* (
-           (def-dir default-directory)
-           (prompt-string
-            (format "This buffer is not visiting a file. Move cli to %s? " def-dir))
-           )
-      (if (yes-or-no-p prompt-string)
-          ;; cheap job for now: assumes cli exists. need to refactor whole thing now.
-          (let* (
-                 (cli-buffer-name (format "cli-%s" def-dir))
-                 (cli-buffer (get-buffer cli-buffer-name))
-                 )
-            (if (bufferp cli-buffer)
-                (switch-to-buffer-other-window cli-buffer)
-              ;; else make the shell buffer called "cli"
-              (shell)
-              (switch-to-buffer-other-window "*shell*")
-              (rename-buffer cli-buffer-name)
-              )
-            ;; make sure we're at point-max, insert and send input
-            (goto-char (point-max))
-            (insert (format "cd %s" def-dir))
-            (comint-send-input)
-            )
-        )
-      )
-    )
-  )
-
 ;;
 (defun swap-windows ()
  "If you have 2 windows, it swaps them." (interactive) (cond ((not (= (count-windows) 2)) (message "You need exactly 2 windows to do this."))
@@ -227,7 +173,6 @@ bottom of the buffer stack."
 (global-set-key [f7] 'gud-next)
 (global-set-key [f8] 'compile)
 (global-set-key [S-f8] 'gtags-find-rtag)
-(global-set-key [f9] 'sw-move-cli-here)
 (global-set-key [(f12)] 'recentf-open-files)
 (global-set-key "\C-a" 'back-to-indentation-or-beginning)
 (global-set-key "\C-l" 'goto-line)          ;; was: redraw garbled screen
@@ -283,7 +228,8 @@ bottom of the buffer stack."
 (defun match-paren (arg)
   "Go to the matching parenthesis if on parenthesis otherwise insert %."
   (interactive "p")
-  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+  (cond ((looking-at "\\s\(") (forward-list 1) (backward-c
+har 1))
         ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
         (t (self-insert-command (or arg 1)))))
 
@@ -765,3 +711,35 @@ bottom of the buffer stack."
 ;; readability
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-readability")
 (require 'readability)
+
+;; eshell
+(require 'eshell)
+(require 'em-smart)
+(setq eshell-where-to-jump 'begin)
+(setq eshell-review-quick-commands nil)
+(setq eshell-smart-space-goes-to-end t)
+
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the
+current buffer's file. The eshell is renamed to match that
+directory to make multiple eshell windows easier."
+  (interactive)
+  (let* ((parent (if (buffer-file-name)
+                     (file-name-directory (buffer-file-name))
+                   default-directory))
+         (height (/ (window-total-height) 2))
+         (name   (car (last (split-string parent "/" t)))))
+    (split-window-vertically (- height))
+    (other-window 1)
+    (eshell "new")
+    (rename-buffer (concat "*eshell: " name "*"))
+
+    (insert (concat "ls"))
+    (eshell-send-input)))
+
+(global-set-key [f9] 'eshell-here)
+
+(defun eshell/x ()
+  (insert "exit")
+  (eshell-send-input)
+  (delete-window))
