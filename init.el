@@ -743,3 +743,10 @@ directory to make multiple eshell windows easier."
   (insert "exit")
   (eshell-send-input)
   (delete-window))
+
+;; async
+(add-to-list 'load-path "~/.emacs.d/site-lisp/s")
+
+;; git timemachine
+(add-to-list 'load-path "~/.emacs.d/site-lisp/git-timemachine")
+(require 'git-timemachine)
