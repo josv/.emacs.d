@@ -79,12 +79,6 @@ bottom of the buffer stack."
 
 (setq grep-find-ignored-directories '(".svn"))
 
-(defun back-to-indentation-or-beginning ()
-  (interactive)
-  (if (= (point) (save-excursion (back-to-indentation) (point)))
-      (beginning-of-line)
-    (back-to-indentation)))
-
 ;;recentf
 (setq recentf-save-file (expand-file-name "recentf" user-emacs-directory))
 (require 'recentf)
@@ -170,11 +164,12 @@ bottom of the buffer stack."
 (global-set-key [C-f5] 'swap-windows)
 (global-set-key [f6] 'gud-step)
 (global-set-key [S-f6] 'gud-watch)
+(global-set-key [M-f6] 'gud-break)
 (global-set-key [f7] 'gud-next)
+(global-set-key [S-f7] 'gud-jump)
 (global-set-key [f8] 'compile)
 (global-set-key [S-f8] 'gtags-find-rtag)
 (global-set-key [(f12)] 'recentf-open-files)
-(global-set-key "\C-a" 'back-to-indentation-or-beginning)
 (global-set-key "\C-l" 'goto-line)          ;; was: redraw garbled screen
 (global-set-key "\C-z" 'undo)               ;; was: suspend-frame
 (global-set-key "\C-w" 'backward-kill-word)
@@ -286,7 +281,7 @@ har 1))
 
 ;; change scrollbar behaviour
 (setq
-  scroll-margin 10
+  scroll-margin 2
   scroll-conservatively 100000
   scroll-preserve-screen-position 1)
 
@@ -367,9 +362,20 @@ har 1))
 (setq auto-mode-alist (cons '("linux-*\\.[ch]$" . linux-c-mode) auto-mode-alist))
 
 ;; git support
+(add-to-list 'load-path "~/.emacs.d/site-lisp/expand-region")
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/git-modes")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/magit")
+(eval-after-load 'info
+  '(progn (info-initialize)
+          (add-to-list 'Info-directory-list "/.emacs.d/site-lisp/magit")))
 (require 'magit)
-(set-face-foreground 'magit-diff-add "green1")
-(set-face-foreground 'magit-diff-del "red4")
+
+;; blame for git (less surprising than magit-blame)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/mo-git-blame")
+
+(autoload 'mo-git-blame-file "mo-git-blame" nil t)
+(autoload 'mo-git-blame-current "mo-git-blame" nil t)
 
 ;; really big files are opened read-only
 (defun find-file-check-make-large-file-read-only-hook ()
@@ -408,11 +414,6 @@ har 1))
 ;; ansi color for shell
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-
-;; autopairing
-(require 'autopair)
-(autopair-global-mode 1)
-(setq autopair-autowrap t)
 
 ;; highlight FIXME/TODO and similar
 (require 'fic-mode)
@@ -462,7 +463,7 @@ har 1))
 
 ;; auto update TAGS file (on save)
 (require 'ctags-update)
-(ctags-update-minor-mode 1)
+(ctags-update-minor-mode 0)
 
 ;; revert without asking
 (setq tags-revert-without-query 1)
@@ -621,6 +622,7 @@ har 1))
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ag")
 (require 'ag)
 (setq ag-highlight-search t)
+(setq ag-arguments (append '("-f" "--ignore" "'*#*#'" "--ignore" "'*~'") ag-arguments))
 
 ;; Copy without selection
 (defun get-point (symbol &optional arg)
@@ -750,3 +752,15 @@ directory to make multiple eshell windows easier."
 ;; git timemachine
 (add-to-list 'load-path "~/.emacs.d/site-lisp/git-timemachine")
 (require 'git-timemachine)
+
+;; monky (hg) support
+(add-to-list 'load-path "~/.emacs.d/site-lisp/monky")
+(require 'monky)
+
+;; By default monky spawns a seperate hg process for every command.
+;; This will be slow if the repo contains lot of changes.
+;; if `monky-process-type' is set to cmdserver then monky will spawn a single
+;; cmdserver and communicate over pipe.
+;; Available only on mercurial versions 1.9 or higher
+
+(setq monky-process-type 'cmdserver)

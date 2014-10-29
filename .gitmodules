@@ -43,3 +43,15 @@
 [submodule "site-lisp/s"]
 	path = site-lisp/s
 	url = https://github.com/magnars/s.el.git
+[submodule "site-lisp/monky"]
+	path = site-lisp/monky
+	url = https://github.com/ananthakumaran/monky.git
+[submodule "site-lisp/git-modes"]
+	path = site-lisp/git-modes
+	url = https://github.com/magit/git-modes.git
+[submodule "site-lisp/magit"]
+	path = site-lisp/magit
+	url = https://github.com/magit/magit.git
+[submodule "site-lisp/mo-git-blame"]
+	path = site-lisp/mo-git-blame
+	url = https://github.com/mbunkus/mo-git-blame.git
