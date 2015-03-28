@@ -55,3 +55,9 @@
 [submodule "site-lisp/mo-git-blame"]
 	path = site-lisp/mo-git-blame
 	url = https://github.com/mbunkus/mo-git-blame.git
+[submodule "site-list/dash"]
+	path = site-list/dash
+	url = https://github.com/magnars/dash.el.git
+[submodule "site-lisp/dash"]
+	path = site-lisp/dash
+	url = https://github.com/magnars/dash.el.git

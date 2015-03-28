@@ -243,7 +243,7 @@ har 1))
 (require 'etags-select)
 
 ;; Use also gnu-global - update with global -u
-(require 'gtags)
+;;(require 'gtags)
 
 (require 'repository-root) ; optional: needed for repository-wide search
 (add-to-list 'repository-root-matchers repository-root-matcher/git)
@@ -619,6 +619,8 @@ har 1))
 (global-set-key [pause] 'toggle-window-dedicated)
 
 ;; Add ag - the silver searcher
+(add-to-list 'load-path "~/.emacs.d/site-lisp/s")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/dash")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ag")
 (require 'ag)
 (setq ag-highlight-search t)
@@ -746,8 +748,6 @@ directory to make multiple eshell windows easier."
   (eshell-send-input)
   (delete-window))
 
-;; async
-(add-to-list 'load-path "~/.emacs.d/site-lisp/s")
 
 ;; git timemachine
 (add-to-list 'load-path "~/.emacs.d/site-lisp/git-timemachine")
