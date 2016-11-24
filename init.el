@@ -182,6 +182,9 @@ bottom of the buffer stack."
 
 (require 'psvn)
 
+(global-set-key "\C-\M-n" "\C-u1\C-v")
+(global-set-key "\C-\M-p" "\C-u1\M-v")
+
 (put 'dired-find-alternate-file 'disabled nil)
 (require 'dired)
 (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
@@ -241,6 +244,12 @@ har 1))
 (require 'etags-table)
 (setq etags-table-search-up-depth 10)
 (require 'etags-select)
+
+(setq etags-table-alist
+      (list
+       '("/home/josu/multicore/workspace/.*/.*\\.[ch]$" "/home/josu/multicore/workspace/scripts/oat_sources/TAGS" "." )
+       ))
+
 
 ;; Use also gnu-global - update with global -u
 (require 'gtags)
@@ -618,6 +627,12 @@ har 1))
 
 (global-set-key [pause] 'toggle-window-dedicated)
 
+;; async
+(add-to-list 'load-path "~/.emacs.d/site-lisp/s")
+
+;; async
+(add-to-list 'load-path "~/.emacs.d/site-lisp/dash")
+
 ;; Add ag - the silver searcher
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ag")
 (require 'ag)
@@ -746,9 +761,6 @@ directory to make multiple eshell windows easier."
   (eshell-send-input)
   (delete-window))
 
-;; async
-(add-to-list 'load-path "~/.emacs.d/site-lisp/s")
-
 ;; git timemachine
 (add-to-list 'load-path "~/.emacs.d/site-lisp/git-timemachine")
 (require 'git-timemachine)
@@ -764,3 +776,70 @@ directory to make multiple eshell windows easier."
 ;; Available only on mercurial versions 1.9 or higher
 
 (setq monky-process-type 'cmdserver)
+
+;; Add yaml mode
+(add-to-list 'load-path "~/.emacs.d/site-lisp/yaml-mode")
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+
+;; Add mmm-mode
+(add-to-list 'load-path "~/.emacs.d/site-lisp/mmm-mode")
+(require 'mmm-mode)
+
+;; Add yang mode
+(require 'yang-mode nil t)
+
+;;ido-imenu
+(defun ido-imenu ()
+  "Update the imenu index and then use ido to select a symbol to navigate to.
+Symbols matching the text at point are put first in the completion list."
+  (interactive)
+  (imenu--make-index-alist)
+  (let ((name-and-pos '())
+        (symbol-names '()))
+    (flet ((addsymbols
+            (symbol-list)
+            (when (listp symbol-list)
+              (dolist (symbol symbol-list)
+                (let ((name nil) (position nil))
+                  (cond
+                   ((and (listp symbol) (imenu--subalist-p symbol))
+                    (addsymbols symbol))
+
+                   ((listp symbol)
+                    (setq name (car symbol))
+                    (setq position (cdr symbol)))
+
+                   ((stringp symbol)
+                    (setq name symbol)
+                    (setq position
+                          (get-text-property 1 'org-imenu-marker symbol))))
+
+                  (unless (or (null position) (null name))
+                    (add-to-list 'symbol-names name)
+                    (add-to-list 'name-and-pos (cons name position))))))))
+      (addsymbols imenu--index-alist))
+    ;; If there are matching symbols at point, put them at the beginning
+    ;; of `symbol-names'.
+    (let ((symbol-at-point (thing-at-point 'symbol)))
+      (when symbol-at-point
+        (let* ((regexp (concat (regexp-quote symbol-at-point) "$"))
+               (matching-symbols
+                (delq nil (mapcar
+                           (lambda (symbol)
+                             (if (string-match regexp symbol) symbol))
+                           symbol-names))))
+          (when matching-symbols
+            (sort matching-symbols (lambda (a b) (> (length a) (length b))))
+            (mapc
+             (lambda (symbol)
+               (setq symbol-names (cons symbol (delete symbol symbol-names))))
+             matching-symbols)))))
+    (let* ((selected-symbol (ido-completing-read "Symbol? " symbol-names))
+           (position (cdr (assoc selected-symbol name-and-pos))))
+      (push-mark)
+      (if (overlayp position)
+          (goto-char (overlay-start position))
+        (goto-char position)))))
+
+(global-set-key (kbd "C-x C-i") 'ido-imenu)

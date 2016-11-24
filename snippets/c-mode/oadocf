@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: OA doxygen header for a function
+# key: oadocf
+# --
+/********************************************************//**
+ * \brief ${brief}
+ *
+ * \param[in] ${param_in}
+ *
+ * \param[out] ${param_out}
+ *
+ * \return ${return}
+ * 
+ ***********************************************************/
