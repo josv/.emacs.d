@@ -111,8 +111,14 @@
 ;; yasnippet
 (use-package yasnippet)
 
-;; yasnippet
+;; ag - silver searcher
+(use-package ag)
+
+;; flycheck
 (use-package flycheck)
+
+(use-package ace-jump-mode)
+(global-set-key (kbd "C-x o") 'ace-jump-mode)
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -160,6 +166,11 @@
     (term-line-mode)
     (hl-line-mode 1))))
 
+(defun term-send-up () (interactive) (term-send-raw-string "\e[A"))
+(defun term-send-down () (interactive) (term-send-raw-string "\e[B"))
+(defun term-send-right () (interactive) (term-send-raw-string "\e[C"))
+(defun term-send-left () (interactive) (term-send-raw-string "\e[D"))
+
 (add-hook 'term-mode-hook (lambda ()
                              (yas-minor-mode -1)
                              (setq term-buffer-maximum-size 1000)
@@ -168,9 +179,62 @@
                              (define-key term-mode-map (kbd "C-t") 'my-term-switch-line-char)
                              (define-key term-raw-map (kbd "C-c C-z") 'term-stop-subjob)
                              (define-key term-raw-map (kbd "C-r") 'term-send-raw)
-                             ))
- 
+			     (define-key term-raw-map (kbd "C-p") 'term-send-up)
+			     (define-key term-raw-map (kbd "C-n") 'term-send-down)
+			     (define-key term-raw-map (kbd "C-b") 'term-send-left)
+			     (define-key term-raw-map (kbd "C-f") 'term-send-right)
+			     (define-key term-raw-map (kbd "<up>") 'term-send-up)
+			     (define-key term-raw-map (kbd "<down>") 'term-send-down)
+			     (define-key term-raw-map (kbd "<right>") 'term-send-right)
+			     (define-key term-raw-map (kbd "<left>") 'term-send-left)
+	    ))
+
 (global-set-key [f9] 'get-term)
+
+;;ibuffer
+(require 'ibuffer)
+(setq ibuffer-shrink-to-minimum-size t)
+(setq ibuffer-always-show-last-buffer nil)
+(setq ibuffer-sorting-mode 'recency)
+(setq ibuffer-use-header-line t)
+
+(setq ibuffer-saved-filter-groups
+  (quote (("default"
+           ("Mail"
+            (or  ;; mail-related buffers
+             (mode . message-mode)
+             (mode . mail-mode)
+             ;; etc.; all your mail related modes
+             ))
+            ("Programming - C" ;; prog stuff not already in MyProjectX
+             (mode . c-mode))
+            ("Programming - Elixir" ;; prog stuff not already in MyProjectX
+             (mode . elixir-mode))
+            ("Programming - Python" ;; prog stuff not already in MyProjectX
+             (mode . python-mode))
+            ("Programming - Ruby" ;; prog stuff not already in MyProjectX
+             (mode . ruby-mode))
+            ("Programming - Emacs-Lisp" ;; prog stuff not already in MyProjectX
+             (mode . emacs-lisp-mode))
+            ("Grep" ;; grep buffers
+             (or
+              (mode . grep-mode)
+              (mode . ag-mode)
+              ))
+            ("YAML" ;; yaml
+             (mode . yaml-mode))
+            ("Man" ;; man
+             (mode . man-mode))
+            ))))
+
+(add-hook 'ibuffer-mode-hook
+  (lambda ()
+    (ibuffer-switch-to-saved-filter-groups "default")))
+
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; kill current buffer without confirmation
+(global-set-key "\C-xk" 'kill-current-buffer)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -178,7 +242,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(multi-term lsp-ui flycheck yasnippet compat treemacs-magit treemacs-projectile lsp-mode elixir-mode treemacs projectile company magit diminish use-package)))
+   '(ace-jump-mode ace-isearch ag multi-term lsp-ui flycheck yasnippet compat treemacs-magit treemacs-projectile lsp-mode elixir-mode treemacs projectile company magit diminish use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
