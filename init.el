@@ -240,7 +240,7 @@
 (defun delete-line (&optional arg)
   "Delete the rest of the current line without affecting the kill ring."
   (interactive "P")
-  (delete-region (point) (progn (forward-visible-line arg) (point))))
+  (delete-region (point) (progn (forward-visible-line (or arg 1)) (point))))
 
 (defun my-minibuffer-setup-hook ()
   (local-set-key (kbd "C-<backspace>") 'delete-backward-char)
@@ -257,7 +257,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-jump-mode multi-term lsp-ui flycheck yasnippet compat treemacs-magit treemacs-projectile lsp-mode elixir-mode treemacs projectile company magit diminish use-package)))
+   '(ag ace-jump-mode multi-term lsp-ui flycheck yasnippet compat treemacs-magit treemacs-projectile lsp-mode elixir-mode treemacs projectile company magit diminish use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
