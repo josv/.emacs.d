@@ -118,7 +118,7 @@
 (use-package flycheck)
 
 (use-package ace-jump-mode)
-(global-set-key (kbd "C-x o") 'ace-jump-mode)
+(global-set-key (kbd "C-c n") 'ace-jump-mode)
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -236,13 +236,28 @@
 ;; kill current buffer without confirmation
 (global-set-key "\C-xk" 'kill-current-buffer)
 
+;; prevent changes in mini-buffer to go into the kill-ring
+(defun delete-line (&optional arg)
+  "Delete the rest of the current line without affecting the kill ring."
+  (interactive "P")
+  (delete-region (point) (progn (forward-visible-line arg) (point))))
+
+(defun my-minibuffer-setup-hook ()
+  (local-set-key (kbd "C-<backspace>") 'delete-backward-char)
+  (local-set-key (kbd "C-k") 'delete-line))
+
+(add-hook 'minibuffer-setup-hook 'my-minibuffer-setup-hook)
+
+;; undo
+(global-set-key "\C-z" 'undo)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ace-jump-mode ace-isearch ag multi-term lsp-ui flycheck yasnippet compat treemacs-magit treemacs-projectile lsp-mode elixir-mode treemacs projectile company magit diminish use-package)))
+   '(ace-jump-mode multi-term lsp-ui flycheck yasnippet compat treemacs-magit treemacs-projectile lsp-mode elixir-mode treemacs projectile company magit diminish use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
